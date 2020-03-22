@@ -11,11 +11,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MaillistComponent } from './maillist/maillist.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 const appRoutes: Routes = [
   {
     path: 'mails',
     component: MailmenuComponent,
+    children: [
+      { path: 'list', component: MaillistComponent, outlet: 'side'},
+   ]
   },
   { path: '',
     redirectTo: '/mails',
@@ -26,7 +33,8 @@ const appRoutes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    MailmenuComponent
+    MailmenuComponent,
+    MaillistComponent
   ],
   imports: [
     RouterModule.forRoot(appRoutes),
@@ -37,7 +45,10 @@ const appRoutes: Routes = [
     MatButtonModule,
     MatSidenavModule,
     MatIconModule,
-    MatListModule
+    MatListModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule
   ],
   providers: [],
   bootstrap: [AppComponent]
