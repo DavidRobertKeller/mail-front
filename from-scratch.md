@@ -33,3 +33,14 @@ imports: [
 ...
 ]
 ```
+
+update mailmenu.component.html, in SideNav tag set attribute fixedInViewport=false 
+
+```html
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport=false
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="(isHandset$ | async) === false"
+
+```
