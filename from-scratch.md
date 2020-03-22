@@ -91,22 +91,22 @@ import { MaillistComponent } from './maillist/maillist.component';
 ...
 const appRoutes: Routes = [
   {
-    path: 'books',
-    component: BookmenuComponent,
+    path: 'mails',
+    component: MailmenuComponent,
     children: [
-      { path: 'list', component: BooklistComponent, outlet: 'side'},
+      { path: 'list', component: MaillistComponent, outlet: 'side'},
    ]
   },
 ```
 
-update bookmenu.component.html
+update mailmenu.component.html
 ```html
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport=false
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
-    <mat-toolbar>Books</mat-toolbar>
+    <mat-toolbar>Mails</mat-toolbar>
     <mat-nav-list>
       <a mat-list-item [routerLink]="['/mails', {outlets: { side: ['list'] } }]" >List</a>
     </mat-nav-list>
