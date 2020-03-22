@@ -80,4 +80,41 @@ rearrange items in mailmenu.component.html
 </mat-sidenav-container>
 ```
 
+build maillist
+```shell
+ng generate @angular/material:table maillist
+```
+
+Update routes in app.module.ts
+```typescript
+import { MaillistComponent } from './maillist/maillist.component';
+...
+const appRoutes: Routes = [
+  {
+    path: 'books',
+    component: BookmenuComponent,
+    children: [
+      { path: 'list', component: BooklistComponent, outlet: 'side'},
+   ]
+  },
+```
+
+update bookmenu.component.html
+```html
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport=false
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="(isHandset$ | async) === false">
+    <mat-toolbar>Books</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/mails', {outlets: { side: ['list'] } }]" >List</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet name="side"></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+```
+
 
