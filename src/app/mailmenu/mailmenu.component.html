@@ -15,10 +15,10 @@
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
-    <mat-toolbar>Mails</mat-toolbar>
+    <mat-toolbar>Mail</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item [routerLink]="['/mails', {outlets: { side: ['list'] } }]" >List</a>
-      <a mat-list-item [routerLink]="['/mails', {outlets: { side: ['add'] } }]" >Write</a>
+      <a mat-list-item [routerLink]="['/mail', {outlets: { side: ['list'] } }]" >List</a>
+      <a mat-list-item [routerLink]="['/mail', {outlets: { side: ['add'] } }]" >Write</a>
     </mat-nav-list>
     </mat-sidenav>
   <mat-sidenav-content>
