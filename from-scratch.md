@@ -148,3 +148,43 @@ update mailmenu.component.html
 ...
 </mat-sidenav-container>
 ```
+
+
+build welcome component
+```shell
+ng generate component welcome
+```
+
+update welcome.component.html
+```html
+<button class="btn btn-default" (click)="login()">
+  Login
+</button>
+```
+
+
+update welcome.component.ts
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-welcome',
+  templateUrl: './welcome.component.html',
+  styleUrls: ['./welcome.component.css']
+})
+export class WelcomeComponent implements OnInit {
+
+  constructor(private router: Router) { }
+
+  public login() {
+    this.router.navigate(['./mail']);
+  }
+
+  ngOnInit(): void {
+  }
+}
+```
+
+
