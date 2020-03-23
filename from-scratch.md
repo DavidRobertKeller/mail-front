@@ -148,3 +148,133 @@ update mailmenu.component.html
 ...
 </mat-sidenav-container>
 ```
+
+
+build welcome component
+```shell
+ng generate component welcome
+```
+
+update welcome.component.html
+```html
+<button class="btn btn-default" (click)="login()">
+  Login
+</button>
+```
+
+
+update welcome.component.ts
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-welcome',
+  templateUrl: './welcome.component.html',
+  styleUrls: ['./welcome.component.css']
+})
+export class WelcomeComponent implements OnInit {
+
+  constructor(private router: Router) { }
+
+  public login() {
+    this.router.navigate(['./mail']);
+  }
+
+  ngOnInit(): void {
+  }
+}
+```
+
+2 components are avalaible for OIDC :
+* 9,4 k Weekly DL : https://www.npmjs.com/package/angular-auth-oidc-client
+* 45 k Weekly DL : https://www.npmjs.com/package/angular-oauth2-oidc
+
+We will use the most downloaded component : 'angular-oauth2-oidc'
+```shell
+npm i angular-oauth2-oidc --save
+```
+
+update app.module.ts
+
+```typescript
+import { HttpClientModule } from '@angular/common/http';
+import { OAuthModule } from 'angular-oauth2-oidc';
+...
+@NgModule({
+...
+  imports: [
+    RouterModule.forRoot(appRoutes),
+    HttpClientModule,
+    OAuthModule.forRoot({
+      resourceServer: {
+          allowedUrls: ['http://localhost:8080/api'],
+          sendAccessToken: true
+      }
+    }),
+```
+
+
+update app.component.ts
+```typescript
+export class AppComponent {
+  title = 'mail-front';
+
+  authConfig: AuthConfig = {
+    issuer: 'http://localhost:9080/auth/realms/mail',
+    redirectUri: window.location.origin + '/mail',
+    clientId: 'mail-user',
+    scope: 'openid profile email offline_access users',
+    responseType: 'code',
+    // at_hash is not present in JWT token
+    disableAtHashCheck: true,
+    showDebugInformation: true
+  };
+
+  public signIn() {
+    this.oauthService.initLoginFlow();
+  }
+
+  public signOut() {
+    this.oauthService.logOut();
+  }
+
+  public getOAuthService() {
+    return this.oauthService;
+  }
+
+  private configure() {
+    this.oauthService.configure(this.authConfig);
+    this.oauthService.tokenValidationHandler = new NullValidationHandler();
+    this.oauthService.loadDiscoveryDocumentAndTryLogin();
+  }
+
+  constructor(private oauthService: OAuthService) {
+    this.configure();
+  }
+}
+```
+
+
+update welcome.component.ts
+
+```typescript
+import { NullValidationHandler, OAuthService, AuthConfig } from 'angular-oauth2-oidc';
+...
+export class WelcomeComponent implements OnInit {
+
+   public login() {
+    this.appComponent.signIn();
+  }
+
+  constructor(private appComponent: AppComponent) {
+  }
+
+  // constructor(private router: Router) { }
+
+  // public login() {
+  //   this.router.navigate(['./mail']);
+  // }
+}
+```
