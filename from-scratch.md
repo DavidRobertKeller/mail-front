@@ -118,3 +118,33 @@ update mailmenu.component.html
 ```
 
 
+
+build mailform
+```shell
+ng generate @angular/material:address-form mailform
+```
+
+Update routes in app.module.ts
+```typescript
+const appRoutes: Routes = [
+  {
+    path: 'mails',
+    component: MailmenuComponent,
+    children: [
+      { path: 'list', component: MaillistComponent, outlet: 'side'},
+      { path: 'add', component: MailformComponent, outlet: 'side'}
+   ]
+  },
+```
+
+update mailmenu.component.html
+```html
+<mat-sidenav-container class="sidenav-container">
+...
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/mails', {outlets: { side: ['list'] } }]" >List</a>
+      <a mat-list-item [routerLink]="['/mails', {outlets: { side: ['add'] } }]" >Write</a>
+    </mat-nav-list>
+...
+</mat-sidenav-container>
+```
