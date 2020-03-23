@@ -21,18 +21,23 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCardModule } from '@angular/material/card';
 import { ReactiveFormsModule } from '@angular/forms';
+import { WelcomeComponent } from './welcome/welcome.component';
 
 const appRoutes: Routes = [
   {
-    path: 'mails',
+    path: 'mail',
     component: MailmenuComponent,
     children: [
       { path: 'list', component: MaillistComponent, outlet: 'side'},
       { path: 'add', component: MailformComponent, outlet: 'side'}
    ]
   },
+  {
+    path: 'welcome',
+    component: WelcomeComponent,
+  },
   { path: '',
-    redirectTo: '/mails',
+    redirectTo: '/welcome',
     pathMatch: 'full',
   },
 ];
@@ -42,7 +47,8 @@ const appRoutes: Routes = [
     AppComponent,
     MailmenuComponent,
     MaillistComponent,
-    MailformComponent
+    MailformComponent,
+    WelcomeComponent
   ],
   imports: [
     RouterModule.forRoot(appRoutes),
