@@ -13,7 +13,7 @@ export class AppComponent {
     issuer: 'http://localhost:9080/auth/realms/mail',
     redirectUri: window.location.origin + '/mail',
     clientId: 'mail-user',
-    scope: 'openid profile email offline_access users',
+    scope: 'openid profile email offline_access user',
     responseType: 'code',
     // at_hash is not present in JWT token
     disableAtHashCheck: true,
