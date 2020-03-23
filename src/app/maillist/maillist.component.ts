@@ -3,6 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { MaillistDataSource, MaillistItem } from './maillist-datasource';
+import { MailService } from '../mail.service';
 
 @Component({
   selector: 'app-maillist',
@@ -18,9 +19,16 @@ export class MaillistComponent implements AfterViewInit, OnInit {
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['id', 'name'];
 
+  constructor(private mailService: MailService) { }
+
   ngOnInit() {
-    this.dataSource = new MaillistDataSource();
+    this.dataSource = new MaillistDataSource(this.mailService);
+    this.dataSource.loadData();
   }
+
+  // ngOnInit() {
+  //   this.dataSource = new MaillistDataSource();
+  // }
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;

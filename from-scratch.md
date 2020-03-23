@@ -19,11 +19,11 @@ import { RouterModule, Routes } from '@angular/router';
 ...
 const appRoutes: Routes = [
   {
-    path: 'mails',
+    path: 'mail',
     component: MailmenuComponent,
   },
   { path: '',
-    redirectTo: '/mails',
+    redirectTo: '/mail',
     pathMatch: 'full',
   },
 ];
@@ -91,7 +91,7 @@ import { MaillistComponent } from './maillist/maillist.component';
 ...
 const appRoutes: Routes = [
   {
-    path: 'mails',
+    path: 'mail',
     component: MailmenuComponent,
     children: [
       { path: 'list', component: MaillistComponent, outlet: 'side'},
@@ -106,9 +106,9 @@ update mailmenu.component.html
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
-    <mat-toolbar>Mails</mat-toolbar>
+    <mat-toolbar>Mail</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item [routerLink]="['/mails', {outlets: { side: ['list'] } }]" >List</a>
+      <a mat-list-item [routerLink]="['/mail', {outlets: { side: ['list'] } }]" >List</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>

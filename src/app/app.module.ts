@@ -21,18 +21,25 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCardModule } from '@angular/material/card';
 import { ReactiveFormsModule } from '@angular/forms';
+import { WelcomeComponent } from './welcome/welcome.component';
+import { HttpClientModule } from '@angular/common/http';
+import { OAuthModule } from 'angular-oauth2-oidc';
 
 const appRoutes: Routes = [
   {
-    path: 'mails',
+    path: 'mail',
     component: MailmenuComponent,
     children: [
       { path: 'list', component: MaillistComponent, outlet: 'side'},
       { path: 'add', component: MailformComponent, outlet: 'side'}
    ]
   },
+  {
+    path: 'welcome',
+    component: WelcomeComponent,
+  },
   { path: '',
-    redirectTo: '/mails',
+    redirectTo: '/welcome',
     pathMatch: 'full',
   },
 ];
@@ -42,10 +49,18 @@ const appRoutes: Routes = [
     AppComponent,
     MailmenuComponent,
     MaillistComponent,
-    MailformComponent
+    MailformComponent,
+    WelcomeComponent
   ],
   imports: [
     RouterModule.forRoot(appRoutes),
+    HttpClientModule,
+    OAuthModule.forRoot({
+      resourceServer: {
+          allowedUrls: ['http://localhost:8080/api'],
+          sendAccessToken: true
+      }
+    }),
     BrowserModule,
     BrowserAnimationsModule,
     LayoutModule,

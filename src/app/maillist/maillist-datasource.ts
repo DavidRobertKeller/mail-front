@@ -3,6 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { map } from 'rxjs/operators';
 import { Observable, of as observableOf, merge } from 'rxjs';
+import { MailService } from '../mail.service';
 
 // TODO: Replace this with your own data model type
 export interface MaillistItem {
@@ -44,9 +45,26 @@ export class MaillistDataSource extends DataSource<MaillistItem> {
   paginator: MatPaginator;
   sort: MatSort;
 
-  constructor() {
+  public loadData() {
+    this.mailService.getMails().subscribe(
+      data => {
+        console.log('remote data', data);
+      },
+      err => {
+        console.log('err', err);
+      }
+    );
+  }
+
+  constructor(
+    private mailService: MailService
+    ) {
     super();
   }
+
+  // constructor() {
+  //   super();
+  // }
 
   /**
    * Connect this data source to the table. The table will only update when
