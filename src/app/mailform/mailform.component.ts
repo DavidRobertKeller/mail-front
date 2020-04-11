@@ -6,11 +6,18 @@ import {MatChipInputEvent} from '@angular/material/chips';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
+export interface MailDocument {
+  name: string;
+  type: string;
+  filename: string;
+}
+
 @Component({
   selector: 'app-mailform',
   templateUrl: './mailform.component.html',
   styleUrls: ['./mailform.component.css']
 })
+
 export class MailformComponent {
   addressForm = this.fb.group({
     type : ['email', Validators.required],
@@ -33,6 +40,14 @@ export class MailformComponent {
 
   @ViewChild('recipientInput') recipientInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
+
+
+  attachments: MailDocument[] = [
+    {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf'},
+    {name: 'order.pdf', type: 'attachment', filename: 'order.pdf'},
+    {name: 'receipt.pdf', type: 'attachment', filename: 'receipt.pdf'},
+  ];
+  attachmentAddOnBlur = true;
 
 
   constructor(private fb: FormBuilder) {
@@ -77,6 +92,30 @@ export class MailformComponent {
 
     return this.allRecipients.filter(recipient => recipient.toLowerCase().indexOf(filterValue) === 0);
   }
+
+  addAttachment(event: MatChipInputEvent): void {
+    const input = event.input;
+    const value = event.value;
+
+    // Add our attachment
+    if ((value || '').trim()) {
+      this.attachments.push({name: value.trim(), type: 'attachment', filename: value.trim()} );
+    }
+
+    // Reset the input value
+    if (input) {
+      input.value = '';
+    }
+  }
+
+  removeAttachment(attachment: MailDocument): void {
+    const index = this.attachments.indexOf(attachment);
+
+    if (index >= 0) {
+      this.attachments.splice(index, 1);
+    }
+  }
+
 
   onSubmit() {
     alert('Thanks!');

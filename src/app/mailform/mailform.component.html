@@ -1,7 +1,7 @@
 <form [formGroup]="addressForm" novalidate (ngSubmit)="onSubmit()">
   <mat-card class="shipping-card">
     <mat-card-header>
-      <mat-card-title>Write a mail</mat-card-title>
+      <mat-card-title>Compose a mail</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <div class="row">
@@ -46,7 +46,6 @@
         </div>
       </div>
 
-
       <div class="row">
         <div class="col">
           <mat-form-field class="full-width">
@@ -54,7 +53,32 @@
           </mat-form-field>
         </div>
       </div>
+
       <div class="row">
+        <div class="col">
+          <mat-form-field class="full-width">
+            <mat-chip-list #chipListAttachment aria-label="Attachment selection">
+              <mat-chip *ngFor="let attachment of attachments" [selectable]="selectable"
+                       [removable]="removable" (removed)="removeAttachment(attachment)">
+                {{attachment.name}}
+                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+              </mat-chip>
+              <input placeholder="Attachments"
+                     [matChipInputFor]="chipListAttachment"
+                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                     [matChipInputAddOnBlur]="attachmentAddOnBlur"
+                     (matChipInputTokenEnd)="addAttachment($event)">
+            </mat-chip-list>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <mat-form-field class="full-width">
+        <mat-label>Content</mat-label>
+        <textarea rows="15" matInput placeholder="Please write content..."></textarea>
+      </mat-form-field>
+
+      <!-- <div class="row">
         <div class="col">
           <mat-form-field >
             <mat-select placeholder="Issuer type" formControlName="issuerType">
@@ -67,7 +91,8 @@
             <input matInput placeholder="issuerReference" formControlName="issuerReference">
           </mat-form-field>
         </div>
-      </div>
+      </div> -->
+
     </mat-card-content>
     <mat-card-actions>
       <button mat-raised-button color="primary" type="submit">Submit</button>
