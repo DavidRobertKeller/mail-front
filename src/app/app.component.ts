@@ -12,7 +12,7 @@ export class AppComponent {
   authConfig: AuthConfig = {
     issuer: 'http://localhost:9080/auth/realms/mail',
     redirectUri: window.location.origin + '/mail',
-    clientId: 'mail-user',
+    clientId: 'spa-mail-user',
     scope: 'openid profile email offline_access user',
     responseType: 'code',
     // at_hash is not present in JWT token
@@ -34,6 +34,7 @@ export class AppComponent {
 
   private configure() {
     this.oauthService.configure(this.authConfig);
+    this.oauthService.setupAutomaticSilentRefresh();
     this.oauthService.tokenValidationHandler = new NullValidationHandler();
     this.oauthService.loadDiscoveryDocumentAndTryLogin();
   }

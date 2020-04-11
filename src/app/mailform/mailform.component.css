@@ -8,8 +8,8 @@
 }
 
 .mat-radio-button {
-  display: block;
-  margin: 5px 0;
+  /* display: block; */
+  margin: 5px 10px 10px 5px;
 }
 
 .row {
