@@ -10,6 +10,8 @@ export interface MailDocument {
   name: string;
   type: string;
   filename: string;
+  filetype: string;
+  size: number;
 }
 
 @Component({
@@ -43,9 +45,9 @@ export class MailformComponent {
 
 
   attachments: MailDocument[] = [
-    {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf'},
-    {name: 'order.pdf', type: 'attachment', filename: 'order.pdf'},
-    {name: 'receipt.pdf', type: 'attachment', filename: 'receipt.pdf'},
+    {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf', filetype: 'application/pdf', size: 207067},
+    {name: 'order.pdf', type: 'attachment', filename: 'order.pdf', filetype: 'application/pdf', size: 207067},
+    {name: 'receipt.pdf', type: 'attachment', filename: 'receipt.pdf', filetype: 'application/pdf', size: 407067},
   ];
   attachmentAddOnBlur = true;
 
@@ -86,13 +88,22 @@ export class MailformComponent {
         const progressInterval = setInterval(() => {
           if (this.files[index].progress === 100) {
             clearInterval(progressInterval);
-            this.uploadFilesSimulator(index + 1);
+            const file = this.files[index];
+            this.attachments.push({
+              name: file.name.trim(),
+              type: 'attachment',
+              filename: file.name.trim(),
+              filetype: file.type,
+              size: file.size
+            });
+            this.files.splice(index, 1);
+            this.uploadFilesSimulator(index);
           } else {
             this.files[index].progress += 5;
           }
-        }, 200);
+        }, 50);
       }
-    }, 1000);
+    }, 500);
   }
 
   /**
@@ -166,20 +177,20 @@ export class MailformComponent {
     return this.allRecipients.filter(recipient => recipient.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  addAttachment(event: MatChipInputEvent): void {
-    const input = event.input;
-    const value = event.value;
+  // addAttachment(event: MatChipInputEvent): void {
+  //   const input = event.input;
+  //   const value = event.value;
 
-    // Add our attachment
-    if ((value || '').trim()) {
-      this.attachments.push({name: value.trim(), type: 'attachment', filename: value.trim()} );
-    }
+  //   // Add our attachment
+  //   if ((value || '').trim()) {
+  //     this.attachments.push({name: value.trim(), type: 'attachment', filename: value.trim()} );
+  //   }
 
-    // Reset the input value
-    if (input) {
-      input.value = '';
-    }
-  }
+  //   // Reset the input value
+  //   if (input) {
+  //     input.value = '';
+  //   }
+  // }
 
   removeAttachment(attachment: MailDocument): void {
     const index = this.attachments.indexOf(attachment);
