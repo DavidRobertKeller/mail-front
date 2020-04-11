@@ -16,3 +16,4 @@ Angular Material:
 * https://stackblitz.com/angular/vmmjrqdrgqk
 * https://www.techiediaries.com/angular-material-navigation-toolbar-sidenav/
 * https://stackoverflow.com/questions/44517737/router-outlet-is-not-a-known-element
+* https://material.angular.io/components/chips/examples
