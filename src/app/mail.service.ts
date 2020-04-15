@@ -29,6 +29,23 @@ export class MailService {
       );
   }
 
+  create(mail: Mail): Observable<Mail> {
+    return this.http.post<Mail>(this.url, mail, this.httpOptions)
+      .pipe(
+        tap(_ => console.log('create mail')),
+        catchError(this.handleError<Mail>('create', mail))
+      );
+  }
+
+  patch(mail: Mail): Observable<Mail> {
+    return this.http.patch<Mail>(this.url, mail, this.httpOptions)
+      .pipe(
+        tap(_ => console.log('patch mail')),
+        catchError(this.handleError<Mail>('patch', mail))
+      );
+  }
+
+
   /**
    * Handle Http operation that failed.
    * Let the app continue.

@@ -5,6 +5,8 @@ import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/a
 import {MatChipInputEvent} from '@angular/material/chips';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { MailService } from '../mail.service';
+import { Mail } from '.././mail';
 
 export interface MailDocument {
   name: string;
@@ -21,15 +23,25 @@ export interface MailDocument {
 })
 
 export class MailformComponent {
+  mail: Mail = {
+    id : null,
+    type : 'email',
+    subject : '',
+  };
+  attachments: MailDocument[] = [
+    // {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf', filetype: 'application/pdf', size: 207067},
+    // {name: 'order.pdf', type: 'attachment', filename: 'order.pdf', filetype: 'application/pdf', size: 207067},
+    // {name: 'receipt.pdf', type: 'attachment', filename: 'receipt.pdf', filetype: 'application/pdf', size: 407067},
+  ];
+
   addressForm = this.fb.group({
-    type : ['email', Validators.required],
+    type : [null, Validators.required],
     subject: [null, Validators.required],
     issuerType: [null],
     issuerReference: [null],
   });
 
   mailObjectTypes = ['contact', 'emailAddress'];
-
 
   visible = true;
   selectable = true;
@@ -44,11 +56,6 @@ export class MailformComponent {
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
 
-  attachments: MailDocument[] = [
-    {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf', filetype: 'application/pdf', size: 207067},
-    {name: 'order.pdf', type: 'attachment', filename: 'order.pdf', filetype: 'application/pdf', size: 207067},
-    {name: 'receipt.pdf', type: 'attachment', filename: 'receipt.pdf', filetype: 'application/pdf', size: 407067},
-  ];
   attachmentAddOnBlur = true;
 
 
@@ -134,12 +141,6 @@ export class MailformComponent {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
-  constructor(private fb: FormBuilder) {
-    this.filteredRecipients = this.recipientCtrl.valueChanges.pipe(
-      startWith(null),
-      map((recipient: string | null) => recipient ? this._filter(recipient) : this.allRecipients.slice()));
-  }
-
   add(event: MatChipInputEvent): void {
     const input = event.input;
     const value = event.value;
@@ -200,8 +201,40 @@ export class MailformComponent {
     }
   }
 
+  constructor(
+    private fb: FormBuilder,
+    private mailService: MailService) {
+
+    this.addressForm.value.type = 'email';
+    this.mail.type = 'EMAIL';
+
+    this.mailService.create(this.mail).subscribe(
+      data => {
+        console.log('data', data);
+        // this.methods.push.apply(this.methods, data.methods);
+        // this.addressForm.setValue(data);
+      },
+      err => {
+        console.log('err', err);
+      }
+    );
+
+    this.filteredRecipients = this.recipientCtrl.valueChanges.pipe(
+      startWith(null),
+      map((recipient: string | null) => recipient ? this._filter(recipient) : this.allRecipients.slice()));
+  }
 
   onSubmit() {
-    alert('Thanks!');
+    this.mailService.patch(this.mail).subscribe(
+      data => {
+        console.log('data', data);
+        // this.methods.push.apply(this.methods, data.methods);
+        // this.addressForm.setValue(data);
+      },
+      err => {
+        console.log('err', err);
+      }
+    );
+
   }
 }
