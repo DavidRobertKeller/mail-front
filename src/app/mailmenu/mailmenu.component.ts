@@ -33,6 +33,6 @@ export class MailmenuComponent {
 
   public logout() {
     this.appComponent.signOut();
-    this.router.navigate(['/welcome']);
+    this.router.navigate(['/']);
   }
 }
