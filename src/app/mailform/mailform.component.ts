@@ -27,6 +27,8 @@ export class MailformComponent {
     id : null,
     type : 'email',
     subject : '',
+    // creationDate : null,
+    // lastModificationDate : null,
   };
   attachments: MailDocument[] = [
     // {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf', filetype: 'application/pdf', size: 207067},

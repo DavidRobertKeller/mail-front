@@ -8,6 +8,11 @@
     <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
   </button>
   <span>mail-front</span>
+  <span class="toolbar-spacer"></span>
+  <span *ngIf= "!!login" >{{login}}</span>
+  <button mat-icon-button [matMenuTriggerFor]="dropdownMenu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
 </mat-toolbar>
 
 <mat-sidenav-container class="sidenav-container">
@@ -25,3 +30,14 @@
     <router-outlet name="side"></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<mat-menu #dropdownMenu x-position="before">
+  <a mat-menu-item (click)="logout()">
+    <mat-icon>exit_to_app</mat-icon>
+    <span>Logout</span>
+  </a>
+  <a mat-menu-item routerLink="/about">
+    <mat-icon>info_outline</mat-icon>
+    <span>About</span>
+  </a>
+</mat-menu>
