@@ -2,8 +2,9 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
-import { MaillistDataSource, MaillistItem } from './maillist-datasource';
+import { MaillistDataSource } from './maillist-datasource';
 import { MailService } from '../mail.service';
+import { Mail } from '../mail';
 
 @Component({
   selector: 'app-maillist',
@@ -13,11 +14,11 @@ import { MailService } from '../mail.service';
 export class MaillistComponent implements AfterViewInit, OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatTable) table: MatTable<MaillistItem>;
+  @ViewChild(MatTable) table: MatTable<Mail>;
   dataSource: MaillistDataSource;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['id', 'name'];
+  displayedColumns = ['subject', 'creator', 'creationDate', 'lastModificationDate'];
 
   constructor(private mailService: MailService) { }
 

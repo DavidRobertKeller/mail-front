@@ -23,13 +23,7 @@ export interface MailDocument {
 })
 
 export class MailformComponent {
-  mail: Mail = {
-    id : null,
-    type : 'email',
-    subject : '',
-    // creationDate : null,
-    // lastModificationDate : null,
-  };
+  mail: Mail;
   attachments: MailDocument[] = [
     // {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf', filetype: 'application/pdf', size: 207067},
     // {name: 'order.pdf', type: 'attachment', filename: 'order.pdf', filetype: 'application/pdf', size: 207067},
@@ -208,13 +202,21 @@ export class MailformComponent {
     private mailService: MailService) {
 
     this.addressForm.value.type = 'email';
-    this.mail.type = 'EMAIL';
+    this.mail = {
+      id : null,
+      subject: 'new mail',
+      creator: null,
+      creationDate: null,
+      lastModificationDate: null,
+      type: 'EMAIL'
+   };
 
     this.mailService.create(this.mail).subscribe(
       data => {
         console.log('data', data);
         // this.methods.push.apply(this.methods, data.methods);
         // this.addressForm.setValue(data);
+        this.mail = data;
       },
       err => {
         console.log('err', err);

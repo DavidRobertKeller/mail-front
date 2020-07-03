@@ -2,27 +2,19 @@ import { DataSource } from '@angular/cdk/collections';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { map } from 'rxjs/operators';
-import { Observable, of as observableOf, merge } from 'rxjs';
+import { Observable, of as observableOf, merge, BehaviorSubject } from 'rxjs';
 import { MailService } from '../mail.service';
-
-// TODO: Replace this with your own data model type
-export interface MaillistItem {
-  name: string;
-  id: number;
-}
-
-// TODO: replace this with real data from your application
-const EXAMPLE_DATA: MaillistItem[] = [
-  {id: 1, name: 'Hydrogen'},
-];
+import { Mail } from '../mail';
 
 /**
  * Data source for the Maillist view. This class should
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class MaillistDataSource extends DataSource<MaillistItem> {
-  data: MaillistItem[] = EXAMPLE_DATA;
+export class MaillistDataSource extends DataSource<Mail> {
+  dataStream = new BehaviorSubject<Mail[]>([]);
+  set data(v: Mail[]) { this.dataStream.next(v); }
+  get data(): Mail[] { return this.dataStream.value; }
   paginator: MatPaginator;
   sort: MatSort;
 
@@ -30,6 +22,7 @@ export class MaillistDataSource extends DataSource<MaillistItem> {
     this.mailService.getMails().subscribe(
       data => {
         console.log('remote data', data);
+        this.data = data;
       },
       err => {
         console.log('err', err);
@@ -52,11 +45,11 @@ export class MaillistDataSource extends DataSource<MaillistItem> {
    * the returned stream emits new items.
    * @returns A stream of the items to be rendered.
    */
-  connect(): Observable<MaillistItem[]> {
+  connect(): Observable<Mail[]> {
     // Combine everything that affects the rendered data into one update
     // stream for the data-table to consume.
     const dataMutations = [
-      observableOf(this.data),
+      this.dataStream,
       this.paginator.page,
       this.sort.sortChange
     ];
@@ -76,7 +69,7 @@ export class MaillistDataSource extends DataSource<MaillistItem> {
    * Paginate the data (client-side). If you're using server-side pagination,
    * this would be replaced by requesting the appropriate data from the server.
    */
-  private getPagedData(data: MaillistItem[]) {
+  private getPagedData(data: Mail[]) {
     const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
     return data.splice(startIndex, this.paginator.pageSize);
   }
@@ -85,7 +78,7 @@ export class MaillistDataSource extends DataSource<MaillistItem> {
    * Sort the data (client-side). If you're using server-side sorting,
    * this would be replaced by requesting the appropriate data from the server.
    */
-  private getSortedData(data: MaillistItem[]) {
+  private getSortedData(data: Mail[]) {
     if (!this.sort.active || this.sort.direction === '') {
       return data;
     }
@@ -93,8 +86,7 @@ export class MaillistDataSource extends DataSource<MaillistItem> {
     return data.sort((a, b) => {
       const isAsc = this.sort.direction === 'asc';
       switch (this.sort.active) {
-        case 'name': return compare(a.name, b.name, isAsc);
-        case 'id': return compare(+a.id, +b.id, isAsc);
+        case 'subject': return compare(a.subject, b.subject, isAsc);
         default: return 0;
       }
     });
