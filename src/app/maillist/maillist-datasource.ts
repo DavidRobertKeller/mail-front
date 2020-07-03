@@ -21,7 +21,6 @@ export class MaillistDataSource extends DataSource<Mail> {
   public loadData() {
     this.mailService.getMails().subscribe(
       data => {
-        console.log('remote data', data);
         this.data = data;
       },
       err => {

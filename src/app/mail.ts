@@ -6,4 +6,6 @@ export interface Mail {
   creationDate: Date;
   lastModificationDate: Date;
   type: string;
+  issuerType: string;
+  issuerReference: string;
 }

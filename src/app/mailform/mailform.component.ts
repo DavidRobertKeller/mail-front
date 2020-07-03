@@ -6,7 +6,7 @@ import {MatChipInputEvent} from '@angular/material/chips';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MailService } from '../mail.service';
-import { Mail } from '.././mail';
+import { Router } from '@angular/router';
 
 export interface MailDocument {
   name: string;
@@ -23,18 +23,24 @@ export interface MailDocument {
 })
 
 export class MailformComponent {
-  mail: Mail;
+  public mailId = null;
+
   attachments: MailDocument[] = [
     // {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf', filetype: 'application/pdf', size: 207067},
     // {name: 'order.pdf', type: 'attachment', filename: 'order.pdf', filetype: 'application/pdf', size: 207067},
     // {name: 'receipt.pdf', type: 'attachment', filename: 'receipt.pdf', filetype: 'application/pdf', size: 407067},
   ];
 
-  addressForm = this.fb.group({
+  editMailForm = this.fb.group({
+    id : [null],
     type : [null, Validators.required],
     subject: [null, Validators.required],
-    issuerType: [null],
-    issuerReference: [null],
+    creator: null,
+    issuer: null,
+    creationDate: Date,
+    lastModificationDate: Date,
+    issuerType: null,
+    issuerReference: null,
   });
 
   mailObjectTypes = ['contact', 'emailAddress'];
@@ -51,31 +57,17 @@ export class MailformComponent {
   @ViewChild('recipientInput') recipientInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
-
   attachmentAddOnBlur = true;
-
-
-
   files: any[] = [];
 
-  /**
-   * on file drop handler
-   */
   onFileDropped($event) {
     this.prepareFilesList($event);
   }
 
-  /**
-   * handle file from browsing
-   */
   fileBrowseHandler(files) {
     this.prepareFilesList(files);
   }
 
-  /**
-   * Delete file from files list
-   * @param index (File index)
-   */
   deleteFile(index: number) {
     this.files.splice(index, 1);
   }
@@ -109,10 +101,6 @@ export class MailformComponent {
     }, 500);
   }
 
-  /**
-   * Convert Files list to normal array list
-   * @param files (Files List)
-   */
   prepareFilesList(files: Array<any>) {
     for (const item of files) {
       item.progress = 0;
@@ -121,11 +109,6 @@ export class MailformComponent {
     this.uploadFilesSimulator(0);
   }
 
-  /**
-   * format bytes
-   * @param bytes (File size in bytes)
-   * @param decimals (Decimals point)
-   */
   formatBytes(bytes, decimals) {
     if (bytes === 0) {
       return '0 Bytes';
@@ -198,25 +181,27 @@ export class MailformComponent {
   }
 
   constructor(
-    private fb: FormBuilder,
-    private mailService: MailService) {
+      private fb: FormBuilder,
+      private mailService: MailService,
+      private router: Router) {
 
-    this.addressForm.value.type = 'email';
-    this.mail = {
+    const mail = {
       id : null,
       subject: 'new mail',
       creator: null,
       creationDate: null,
       lastModificationDate: null,
-      type: 'EMAIL'
-   };
+      type: 'EMAIL',
+      issuerType: null,
+      issuerReference: null
+    };
 
-    this.mailService.create(this.mail).subscribe(
+    this.mailService.create(mail).subscribe(
       data => {
-        console.log('data', data);
-        // this.methods.push.apply(this.methods, data.methods);
-        // this.addressForm.setValue(data);
-        this.mail = data;
+        this.mailId = data.id;
+        data.issuerType = null;
+        data.issuerReference = null;
+        this.editMailForm.setValue(data);
       },
       err => {
         console.log('err', err);
@@ -229,11 +214,22 @@ export class MailformComponent {
   }
 
   onSubmit() {
-    this.mailService.patch(this.mail).subscribe(
+    const value = this.editMailForm.value;
+
+    const mail = {
+      id : value.id,
+      subject: value.subject,
+      creator: value.creator,
+      creationDate: null,
+      lastModificationDate: null,
+      type: value.type.toUpperCase(),
+      issuerType: null,
+      issuerReference: null
+    };
+
+    this.mailService.patch(mail).subscribe(
       data => {
-        console.log('data', data);
-        // this.methods.push.apply(this.methods, data.methods);
-        // this.addressForm.setValue(data);
+        this.router.navigate(['/mail']);
       },
       err => {
         console.log('err', err);

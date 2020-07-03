@@ -24,7 +24,6 @@ export class MailService {
 
     return this.http.get<Mail[]>(this.url, this.httpOptions)
       .pipe(
-        tap(_ => console.log('fetched mails')),
         catchError(this.handleError<Mail[]>('getMails', []))
       );
   }
@@ -32,15 +31,13 @@ export class MailService {
   create(mail: Mail): Observable<Mail> {
     return this.http.post<Mail>(this.url, mail, this.httpOptions)
       .pipe(
-        tap(_ => console.log('create mail')),
         catchError(this.handleError<Mail>('create', mail))
       );
   }
 
   patch(mail: Mail): Observable<Mail> {
-    return this.http.patch<Mail>(this.url, mail, this.httpOptions)
+    return this.http.patch<Mail>(this.url + mail.id, mail, this.httpOptions)
       .pipe(
-        tap(_ => console.log('patch mail')),
         catchError(this.handleError<Mail>('patch', mail))
       );
   }
