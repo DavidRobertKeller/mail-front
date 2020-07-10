@@ -25,6 +25,8 @@ export interface MailDocument {
 export class MailformComponent {
   public mailId = null;
 
+  mailStates = ['DRAFT', 'WORKING', 'CLOSED', 'ARCHIVED'];
+
   attachments: MailDocument[] = [
     // {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf', filetype: 'application/pdf', size: 207067},
     // {name: 'order.pdf', type: 'attachment', filename: 'order.pdf', filetype: 'application/pdf', size: 207067},
@@ -32,8 +34,9 @@ export class MailformComponent {
   ];
 
   editMailForm = this.fb.group({
-    id : [null],
-    type : [null, Validators.required],
+    id: [null],
+    type: [null, Validators.required],
+    state: [null, Validators.required],
     subject: [null, Validators.required],
     creator: null,
     issuer: null,
@@ -49,16 +52,76 @@ export class MailformComponent {
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
+
   recipientCtrl = new FormControl();
   filteredRecipients: Observable<string[]>;
   recipients: string[] = ['bob@example.com'];
   allRecipients: string[] = ['bob@example.com', 'alice@example.com', 'milan@example.com', 'victoria@example.com'];
-
   @ViewChild('recipientInput') recipientInput: ElementRef<HTMLInputElement>;
-  @ViewChild('auto') matAutocomplete: MatAutocomplete;
+  @ViewChild('recipientAuto') recipientAutocomplete: MatAutocomplete;
+
+  signerCtrl = new FormControl();
+  filteredSigners: Observable<string[]>;
+  signers: string[] = ['milan@example.com'];
+  allSigner: string[] = ['bob@example.com', 'alice@example.com', 'milan@example.com', 'victoria@example.com'];
+  @ViewChild('signerInput') signerInput: ElementRef<HTMLInputElement>;
+  @ViewChild('signerAuto') signerAutocomplete: MatAutocomplete;
+
+  validatorCtrl = new FormControl();
+  filteredValidators: Observable<string[]>;
+  validators: string[] = ['victoria@example.com'];
+  allValidators: string[] = ['bob@example.com', 'alice@example.com', 'milan@example.com', 'victoria@example.com'];
+  @ViewChild('validatorInput') validatorInput: ElementRef<HTMLInputElement>;
+  @ViewChild('validatorAuto') validatorAutocomplete: MatAutocomplete;
 
   attachmentAddOnBlur = true;
   files: any[] = [];
+
+
+  constructor(
+    private fb: FormBuilder,
+    private mailService: MailService,
+    private router: Router) {
+
+  const mail = {
+    id : null,
+    subject: 'new mail',
+    creator: null,
+    creationDate: null,
+    lastModificationDate: null,
+    type: 'EMAIL',
+    state: 'DRAFT',
+    issuer: null,
+    issuerType: null,
+    issuerReference: null
+  };
+
+  this.mailService.create(mail).subscribe(
+    data => {
+      this.mailId = data.id;
+      data.issuerType = null;
+      data.issuerReference = null;
+      data.type = data.type.toLocaleLowerCase();
+      this.editMailForm.setValue(data);
+    },
+    err => {
+      console.log('err', err);
+    }
+  );
+
+  this.filteredRecipients = this.recipientCtrl.valueChanges.pipe(
+    startWith(null),
+    map((recipient: string | null) => recipient ? this._filter(recipient, this.allRecipients) : this.allRecipients.slice()));
+
+  this.filteredSigners = this.signerCtrl.valueChanges.pipe(
+    startWith(null),
+    map((signer: string | null) => signer ? this._filter(signer, this.allSigner) : this.allSigner.slice()));
+
+  this.filteredValidators = this.validatorCtrl.valueChanges.pipe(
+    startWith(null),
+    map((validator: string | null) => validator ? this._filter(validator, this.allValidators) : this.allValidators.slice()));
+
+}
 
   onFileDropped($event) {
     this.prepareFilesList($event);
@@ -120,13 +183,26 @@ export class MailformComponent {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
-  add(event: MatChipInputEvent): void {
+  addActor(event: MatChipInputEvent, actorType: string): void {
     const input = event.input;
     const value = event.value;
 
+    let actors: string[] = null;
+    let ctrl = null;
+    if (actorType === 'recipient') {
+      actors = this.recipients;
+      ctrl = this.recipientCtrl;
+    } else if (actorType === 'signer') {
+      actors = this.signers;
+      ctrl = this.signerCtrl;
+    } else if (actorType === 'validator') {
+      actors = this.validators;
+      ctrl = this.validatorCtrl;
+    }
+
     // Add our recipient
     if ((value || '').trim()) {
-      this.recipients.push(value.trim());
+      actors.push(value.trim());
     }
 
     // Reset the input value
@@ -134,27 +210,51 @@ export class MailformComponent {
       input.value = '';
     }
 
-    this.recipientCtrl.setValue(null);
+    ctrl.setValue(null);
   }
 
-  remove(recipient: string): void {
-    const index = this.recipients.indexOf(recipient);
+  removeActor(recipient: string, actorType: string): void {
+    let actors = null;
+    if (actorType === 'recipient') {
+      actors = this.recipients;
+    } else if (actorType === 'signer') {
+      actors = this.signers;
+    } else if (actorType === 'validator') {
+      actors = this.validators;
+    }
+    const index = actors.indexOf(recipient);
 
     if (index >= 0) {
-      this.recipients.splice(index, 1);
+      actors.splice(index, 1);
     }
   }
 
-  selected(event: MatAutocompleteSelectedEvent): void {
-    this.recipients.push(event.option.viewValue);
-    this.recipientInput.nativeElement.value = '';
-    this.recipientCtrl.setValue(null);
+  selectedActor(event: MatAutocompleteSelectedEvent, actorType: string): void {
+    let actors = null;
+    let actorInput = null;
+    let ctrl = null;
+    if (actorType === 'recipient') {
+      actors = this.recipients;
+      actorInput = this.recipientInput;
+      ctrl = this.recipientCtrl;
+    } else if (actorType === 'signer') {
+      actors = this.signers;
+      actorInput = this.signerInput;
+      ctrl = this.signerCtrl;
+    } else if (actorType === 'validator') {
+      actors = this.validators;
+      actorInput = this.validatorInput;
+      ctrl = this.validatorCtrl;
+    }
+    actors.push(event.option.viewValue);
+    actorInput.nativeElement.value = '';
+    ctrl.setValue(null);
   }
 
-  private _filter(value: string): string[] {
+  private _filter(value: string, actors: string[]): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.allRecipients.filter(recipient => recipient.toLowerCase().indexOf(filterValue) === 0);
+    return actors.filter(actor => actor.toLowerCase().indexOf(filterValue) === 0);
   }
 
   // addAttachment(event: MatChipInputEvent): void {
@@ -180,38 +280,7 @@ export class MailformComponent {
     }
   }
 
-  constructor(
-      private fb: FormBuilder,
-      private mailService: MailService,
-      private router: Router) {
 
-    const mail = {
-      id : null,
-      subject: 'new mail',
-      creator: null,
-      creationDate: null,
-      lastModificationDate: null,
-      type: 'EMAIL',
-      issuerType: null,
-      issuerReference: null
-    };
-
-    this.mailService.create(mail).subscribe(
-      data => {
-        this.mailId = data.id;
-        data.issuerType = null;
-        data.issuerReference = null;
-        this.editMailForm.setValue(data);
-      },
-      err => {
-        console.log('err', err);
-      }
-    );
-
-    this.filteredRecipients = this.recipientCtrl.valueChanges.pipe(
-      startWith(null),
-      map((recipient: string | null) => recipient ? this._filter(recipient) : this.allRecipients.slice()));
-  }
 
   onSubmit() {
     const value = this.editMailForm.value;
@@ -223,6 +292,7 @@ export class MailformComponent {
       creationDate: null,
       lastModificationDate: null,
       type: value.type.toUpperCase(),
+      issuer: null,
       issuerType: null,
       issuerReference: null
     };

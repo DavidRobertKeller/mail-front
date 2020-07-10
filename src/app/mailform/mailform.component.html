@@ -16,15 +16,16 @@
         </div>
       </div>
 
-      <div class="row">
+      <!-- recipient -->
+      <div class="row" >
         <div class="col">
           <mat-form-field class="full-width">
-            <mat-chip-list #chipList aria-label="Recipient selection">
+            <mat-chip-list #recipientChipList aria-label="Recipient selection">
               <mat-chip
                 *ngFor="let recipient of recipients"
                 [selectable]="selectable"
                 [removable]="removable"
-                (removed)="remove(recipient)">
+                (removed)="removeActor(recipient, 'recipient')">
                 {{recipient}}
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
               </mat-chip>
@@ -32,14 +33,76 @@
                 placeholder="Recipients"
                 #recipientInput
                 [formControl]="recipientCtrl"
-                [matAutocomplete]="auto"
-                [matChipInputFor]="chipList"
+                [matAutocomplete]="recipientAuto"
+                [matChipInputFor]="recipientChipList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                (matChipInputTokenEnd)="add($event)">
+                (matChipInputTokenEnd)="addActor($event, 'recipient')">
             </mat-chip-list>
-            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-autocomplete #recipientAuto="matAutocomplete" (optionSelected)="selectedActor($event, 'recipient')">
               <mat-option *ngFor="let recipient of filteredRecipients | async" [value]="recipient">
                 {{recipient}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- signer -->
+      <div class="row" *ngIf="editMailForm.value.type == 'bmail'" >
+        <div class="col">
+          <mat-form-field class="full-width">
+            <mat-chip-list #signerChipList aria-label="Signer selection">
+              <mat-chip
+                *ngFor="let signer of signers"
+                [selectable]="selectable"
+                [removable]="removable"
+                (removed)="removeActor(signer, 'signer')">
+                {{signer}}
+                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+              </mat-chip>
+              <input
+                placeholder="Signers"
+                #signerInput
+                [formControl]="signerCtrl"
+                [matAutocomplete]="signerAuto"
+                [matChipInputFor]="signerChipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                (matChipInputTokenEnd)="addActor($event, 'signer')">
+            </mat-chip-list>
+            <mat-autocomplete  #signerAuto="matAutocomplete" (optionSelected)="selectedActor($event, 'signer')">
+              <mat-option *ngFor="let signer of filteredSigners | async" [value]="signer" >
+                {{signer}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- validator -->
+      <div class="row" *ngIf="editMailForm.value.type == 'bmail'" >
+        <div class="col">
+          <mat-form-field class="full-width">
+            <mat-chip-list #validatorChipList aria-label="Validator selection">
+              <mat-chip
+                *ngFor="let validator of validators"
+                [selectable]="selectable"
+                [removable]="removable"
+                (removed)="removeActor(validator, 'validator')">
+                {{validator}}
+                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+              </mat-chip>
+              <input
+                placeholder="Validators"
+                #validatorInput
+                [formControl]="validatorCtrl"
+                [matAutocomplete]="validatorAuto"
+                [matChipInputFor]="validatorChipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                (matChipInputTokenEnd)="addActor($event, 'validator')">
+            </mat-chip-list>
+            <mat-autocomplete #validatorAuto="matAutocomplete" (optionSelected)="selectedActor($event, 'validator')">
+              <mat-option *ngFor="let validator of filteredValidators | async" [value]="validator">
+                {{validator}}
               </mat-option>
             </mat-autocomplete>
           </mat-form-field>
@@ -101,6 +164,18 @@
           <mat-form-field class="full-width">
             <mat-label>Content</mat-label>
             <textarea rows="15" matInput placeholder="Please write content..."></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <mat-form-field class="full-width">
+            <mat-select placeholder="State" formControlName="state">
+              <mat-option *ngFor="let state of mailStates" [value]="state">
+                {{ state }}
+              </mat-option>
+            </mat-select>
           </mat-form-field>
         </div>
       </div>

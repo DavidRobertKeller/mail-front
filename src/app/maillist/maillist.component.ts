@@ -18,7 +18,7 @@ export class MaillistComponent implements AfterViewInit, OnInit {
   dataSource: MaillistDataSource;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['subject', 'creator', 'creationDate', 'lastModificationDate'];
+  displayedColumns = ['type', 'state', 'subject', 'creator', 'creationDate', 'lastModificationDate'];
 
   constructor(private mailService: MailService) { }
 
