@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MailService } from '../mail.service';
 import { Router } from '@angular/router';
+import { HttpClient, HttpEvent, HttpParams, HttpRequest, HttpEventType, HttpResponse, HttpHeaders } from '@angular/common/http';
 
 export interface MailDocument {
   name: string;
@@ -24,6 +25,8 @@ export interface MailDocument {
 
 export class MailformComponent {
   public mailId = null;
+  mockFileUpload = false;
+  apiEndPoint = 'http://localhost:8080/api/document/multipart/';
 
   mailStates = ['DRAFT', 'WORKING', 'CLOSED', 'ARCHIVED'];
 
@@ -81,7 +84,8 @@ export class MailformComponent {
   constructor(
     private fb: FormBuilder,
     private mailService: MailService,
-    private router: Router) {
+    private router: Router,
+    private http: HttpClient) {
 
   const mail = {
     id : null,
@@ -164,12 +168,42 @@ export class MailformComponent {
     }, 500);
   }
 
+  public downloadFile() {
+    let id = '5f3edbc446d4ca6154cf23df';
+    this.http.get<any>(this.apiEndPoint + id).subscribe(res => {
+      console.log(res);
+    }, err => {
+      console.log(err);
+    });
+  }
+
   prepareFilesList(files: Array<any>) {
     for (const item of files) {
       item.progress = 0;
       this.files.push(item);
     }
-    this.uploadFilesSimulator(0);
+
+    if (this.mockFileUpload) {
+      this.uploadFilesSimulator(0);
+    }
+    else {
+      console.log('coucou');
+      if(files.length > 0) {
+
+        let headers = new HttpHeaders();
+        headers = headers.append('Accept', 'application/json');
+
+        const formData: FormData = new FormData();
+        formData.append('file2', files[0]); 
+        formData.append('file', files[0]);
+
+        this.http.post<any>(this.apiEndPoint + 'noreactive', formData, {headers}).subscribe(res => {
+          console.log(res);
+        }, err => {
+          console.log(err);
+        });
+      }
+    }
   }
 
   formatBytes(bytes, decimals) {
