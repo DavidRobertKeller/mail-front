@@ -197,7 +197,7 @@ export class MailformComponent {
         formData.append('file2', files[0]); 
         formData.append('file', files[0]);
 
-        this.http.post<any>(this.apiEndPoint + 'noreactive', formData, {headers}).subscribe(res => {
+        this.http.post<any>(this.apiEndPoint + 'reactive', formData, {headers}).subscribe(res => {
           console.log(res);
         }, err => {
           console.log(err);
