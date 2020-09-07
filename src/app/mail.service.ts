@@ -21,7 +21,7 @@ export class MailService {
 
   /** GET mails from the server */
   getMails(): Observable<Mail[]> {
-
+    console.log('hello');
     return this.http.get<Mail[]>(this.url, this.httpOptions)
       .pipe(
         catchError(this.handleError<Mail[]>('getMails', []))

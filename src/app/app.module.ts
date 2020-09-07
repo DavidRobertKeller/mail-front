@@ -49,7 +49,7 @@ const appRoutes: Routes = [
     HttpClientModule,
     OAuthModule.forRoot({
       resourceServer: {
-          allowedUrls: ['http://localhost:8080/api'],
+          allowedUrls: ['http://localhost:8080'],
           sendAccessToken: true
       }
     }),

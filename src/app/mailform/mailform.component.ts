@@ -26,7 +26,7 @@ export interface MailDocument {
 export class MailformComponent {
   public mailId = null;
   mockFileUpload = false;
-  apiEndPoint = 'http://localhost:8080/api/document/multipart/';
+  apiEndPoint = 'http://localhost:8080/api/mail/document/';
 
   mailStates = ['DRAFT', 'WORKING', 'CLOSED', 'ARCHIVED'];
 
@@ -169,12 +169,18 @@ export class MailformComponent {
   }
 
   public downloadFile() {
-    let id = '5f3edbc446d4ca6154cf23df';
-    this.http.get<any>(this.apiEndPoint + id).subscribe(res => {
-      console.log(res);
-    }, err => {
-      console.log(err);
-    });
+    let id = '5f50ff011a9e9052c554808a';
+
+    let link = document.createElement("a");
+    link.download = "filename";
+    link.href = this.apiEndPoint + id;
+    link.click();
+
+    // this.http.get<any>(this.apiEndPoint + id).subscribe(res => {
+    //   console.log(res);
+    // }, err => {
+    //   console.log(err);
+    // });
   }
 
   prepareFilesList(files: Array<any>) {
@@ -187,17 +193,21 @@ export class MailformComponent {
       this.uploadFilesSimulator(0);
     }
     else {
-      console.log('coucou');
       if(files.length > 0) {
 
         let headers = new HttpHeaders();
         headers = headers.append('Accept', 'application/json');
 
         const formData: FormData = new FormData();
-        formData.append('file2', files[0]); 
+        // formData.append('file2', files[0]); 
         formData.append('file', files[0]);
+        formData.append('metadata', JSON.stringify({type: 'main', isLastRevision: true}));
+        
+        // formData.append('type', 'main');
+        // formData.append('state', 'active');
+        // formData.append('isLastRevision', 'true');
 
-        this.http.post<any>(this.apiEndPoint + 'reactive', formData, {headers}).subscribe(res => {
+        this.http.post<any>(this.apiEndPoint + this.mailId, formData, {headers}).subscribe(res => {
           console.log(res);
         }, err => {
           console.log(err);
