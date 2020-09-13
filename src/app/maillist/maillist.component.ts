@@ -5,6 +5,7 @@ import { MatTable } from '@angular/material/table';
 import { MaillistDataSource } from './maillist-datasource';
 import { MailService } from '../mail.service';
 import { Mail } from '../mail';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-maillist',
@@ -20,7 +21,7 @@ export class MaillistComponent implements AfterViewInit, OnInit {
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['type', 'state', 'subject', 'creator', 'creationDate', 'lastModificationDate'];
 
-  constructor(private mailService: MailService) { }
+  constructor(private mailService: MailService, private router: Router) { }
 
   ngOnInit() {
     this.dataSource = new MaillistDataSource(this.mailService);
@@ -35,5 +36,15 @@ export class MaillistComponent implements AfterViewInit, OnInit {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.table.dataSource = this.dataSource;
+  }
+
+  public getRecord(row: any) {
+    console.log('row', row);
+
+    // this.router.navigate(['/mail/(side:edit)/' + row.id]);
+    // this.router.navigate([{  outlets: { side: ['/mail'] } }], { skipLocationChange: true });
+//    this.router.navigate([{ outlets: { primary: 'mail', side: ['add'] } }], { skipLocationChange: true });
+    this.router.navigateByUrl('/mail/(side:edit/' + row.id + ')');
+
   }
 }

@@ -1,12 +1,12 @@
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormControl } from '@angular/forms';
 import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
 import {MatChipInputEvent} from '@angular/material/chips';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MailService } from '../mail.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpEvent, HttpParams, HttpRequest, HttpEventType, HttpResponse, HttpHeaders } from '@angular/common/http';
 
 export interface MailDocument {
@@ -23,7 +23,7 @@ export interface MailDocument {
   styleUrls: ['./mailform.component.scss']
 })
 
-export class MailformComponent {
+export class MailformComponent implements OnInit {
   public mailId = null;
   mockFileUpload = false;
   apiEndPoint = 'http://localhost:8080/api/mail/document/';
@@ -85,47 +85,75 @@ export class MailformComponent {
     private fb: FormBuilder,
     private mailService: MailService,
     private router: Router,
+    private route: ActivatedRoute,
     private http: HttpClient) {
+    }
 
-  const mail = {
-    id : null,
-    subject: 'new mail',
-    creator: null,
-    creationDate: null,
-    lastModificationDate: null,
-    type: 'EMAIL',
-    state: 'DRAFT',
-    issuer: null,
-    issuerType: null,
-    issuerReference: null
-  };
+  ngOnInit() {
+    
+    const mailId = this.route.snapshot.params['mail-id'];
 
-  this.mailService.create(mail).subscribe(
-    data => {
+    if (mailId == null) {
+      const mail = {
+        id : null,
+        subject: 'new mail',
+        creator: null,
+        creationDate: null,
+        lastModificationDate: null,
+        type: 'EMAIL',
+        state: 'DRAFT',
+        issuer: null,
+        issuerType: null,
+        issuerReference: null
+      };
+  
+      this.mailService.create(mail).subscribe(
+        data => {
+          this.mailId = data.id;
+          data.issuerType = null;
+          data.issuerReference = null;
+          data.type = data.type.toLocaleLowerCase();
+          this.editMailForm.setValue(data);
+        },
+        err => {
+          console.log('err', err);
+        }
+      );
+    } else {
+
+      const data = {
+        id : mailId,
+        subject: 'TODO',
+        creator: null,
+        creationDate: null,
+        lastModificationDate: null,
+        type: 'EMAIL',
+        state: 'DRAFT',
+        issuer: null,
+        issuerType: null,
+        issuerReference: null
+      };
+
       this.mailId = data.id;
       data.issuerType = null;
       data.issuerReference = null;
       data.type = data.type.toLocaleLowerCase();
       this.editMailForm.setValue(data);
-    },
-    err => {
-      console.log('err', err);
     }
-  );
 
-  this.filteredRecipients = this.recipientCtrl.valueChanges.pipe(
-    startWith(null),
-    map((recipient: string | null) => recipient ? this._filter(recipient, this.allRecipients) : this.allRecipients.slice()));
+    this.filteredRecipients = this.recipientCtrl.valueChanges.pipe(
+      startWith(null),
+      map((recipient: string | null) => recipient ? this._filter(recipient, this.allRecipients) : this.allRecipients.slice()));
 
-  this.filteredSigners = this.signerCtrl.valueChanges.pipe(
-    startWith(null),
-    map((signer: string | null) => signer ? this._filter(signer, this.allSigner) : this.allSigner.slice()));
+    this.filteredSigners = this.signerCtrl.valueChanges.pipe(
+      startWith(null),
+      map((signer: string | null) => signer ? this._filter(signer, this.allSigner) : this.allSigner.slice()));
 
-  this.filteredValidators = this.validatorCtrl.valueChanges.pipe(
-    startWith(null),
-    map((validator: string | null) => validator ? this._filter(validator, this.allValidators) : this.allValidators.slice()));
+    this.filteredValidators = this.validatorCtrl.valueChanges.pipe(
+      startWith(null),
+      map((validator: string | null) => validator ? this._filter(validator, this.allValidators) : this.allValidators.slice()));
 
-}
+  }
 
   onFileDropped($event) {
     this.prepareFilesList($event);

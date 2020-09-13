@@ -21,7 +21,8 @@ const appRoutes: Routes = [
     component: MailmenuComponent,
     children: [
       { path: 'list', component: MaillistComponent, outlet: 'side'},
-      { path: 'add', component: MailformComponent, outlet: 'side'}
+      { path: 'add', component: MailformComponent, outlet: 'side'},
+      { path: 'edit/:mail-id', component: MailformComponent, outlet: 'side'}
    ]
   },
   {
