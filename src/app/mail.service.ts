@@ -21,10 +21,17 @@ export class MailService {
 
   /** GET mails from the server */
   getMails(): Observable<Mail[]> {
-    console.log('hello');
     return this.http.get<Mail[]>(this.url, this.httpOptions)
       .pipe(
         catchError(this.handleError<Mail[]>('getMails', []))
+      );
+  }
+
+  get(id : string): Observable<Mail> {
+   return this.http.get<Mail>(this.url + id + '/metadata', this.httpOptions)
+    // return this.http.get<Mail>(this.url + id, this.httpOptions)
+      .pipe(
+        catchError(this.handleError<Mail>('get', null))
       );
   }
 
@@ -42,6 +49,12 @@ export class MailService {
       );
   }
 
+  removeById(id: String): Observable<String> {
+    return this.http.delete<String>(this.url + id, this.httpOptions)
+      .pipe(
+        catchError(this.handleError<String>('remove', id))
+      );
+  }
 
   /**
    * Handle Http operation that failed.

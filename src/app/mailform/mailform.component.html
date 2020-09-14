@@ -1,7 +1,7 @@
-<form [formGroup]="editMailForm" novalidate (ngSubmit)="onSubmit()">
+<form [formGroup]="editMailForm" novalidate (ngSubmit)="onSubmit()" *ngIf="mail">
   <mat-card class="shipping-card" appDnd (fileDropped)="onFileDropped($event)">
     <mat-card-header>
-      <mat-card-title>Compose a mail {{mailId}}</mat-card-title>
+      <mat-card-title>Compose a mail {{mail.id}}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <div class="row">
@@ -125,7 +125,7 @@
                 <mat-icon>attachment</mat-icon>
                 <input #fileInput type="file" multiple (change)="fileBrowseHandler($event.target.files)" style="display:none;" />
               </button>
-              <mat-chip *ngFor="let attachment of attachments" [selectable]="selectable"
+              <mat-chip *ngFor="let attachment of mail.documents" [selectable]="selectable"
                        [removable]="removable" (removed)="removeAttachment(attachment)">
                 {{attachment.name}}
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
@@ -184,6 +184,7 @@
     <mat-card-actions>
       <button mat-raised-button color="primary" type="submit">Submit</button>
       <button mat-raised-button color="primary" type="button" (click)="downloadFile()">Load Document</button>
+      <button mat-raised-button color="primary" type="button" (click)="removeMail()">Remove</button>
     </mat-card-actions>
   </mat-card>
 </form>

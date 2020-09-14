@@ -1,21 +1,14 @@
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import { COMMA, ENTER} from '@angular/cdk/keycodes';
 import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormControl } from '@angular/forms';
-import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
-import {MatChipInputEvent} from '@angular/material/chips';
+import { MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
+import { MatChipInputEvent} from '@angular/material/chips';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { Mail, MailDocument } from '../mail';
 import { MailService } from '../mail.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient, HttpEvent, HttpParams, HttpRequest, HttpEventType, HttpResponse, HttpHeaders } from '@angular/common/http';
-
-export interface MailDocument {
-  name: string;
-  type: string;
-  filename: string;
-  filetype: string;
-  size: number;
-}
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-mailform',
@@ -24,17 +17,14 @@ export interface MailDocument {
 })
 
 export class MailformComponent implements OnInit {
-  public mailId = null;
+  public mail: Mail;
+  files: any[] = [];
+
   mockFileUpload = false;
+  attachmentAddOnBlur = true;
   apiEndPoint = 'http://localhost:8080/api/mail/document/';
 
   mailStates = ['DRAFT', 'WORKING', 'CLOSED', 'ARCHIVED'];
-
-  attachments: MailDocument[] = [
-    // {name: 'invoice.pdf', type: 'attachment', filename: 'invoice.pdf', filetype: 'application/pdf', size: 207067},
-    // {name: 'order.pdf', type: 'attachment', filename: 'order.pdf', filetype: 'application/pdf', size: 207067},
-    // {name: 'receipt.pdf', type: 'attachment', filename: 'receipt.pdf', filetype: 'application/pdf', size: 407067},
-  ];
 
   editMailForm = this.fb.group({
     id: [null],
@@ -47,6 +37,7 @@ export class MailformComponent implements OnInit {
     lastModificationDate: Date,
     issuerType: null,
     issuerReference: null,
+    documents: []
   });
 
   mailObjectTypes = ['contact', 'emailAddress'];
@@ -77,8 +68,6 @@ export class MailformComponent implements OnInit {
   @ViewChild('validatorInput') validatorInput: ElementRef<HTMLInputElement>;
   @ViewChild('validatorAuto') validatorAutocomplete: MatAutocomplete;
 
-  attachmentAddOnBlur = true;
-  files: any[] = [];
 
 
   constructor(
@@ -94,22 +83,23 @@ export class MailformComponent implements OnInit {
     const mailId = this.route.snapshot.params['mail-id'];
 
     if (mailId == null) {
-      const mail = {
+      this.mail = {
         id : null,
         subject: 'new mail',
         creator: null,
         creationDate: null,
         lastModificationDate: null,
         type: 'EMAIL',
-        state: 'DRAFT',
+        // state: 'DRAFT',
         issuer: null,
         issuerType: null,
-        issuerReference: null
+        issuerReference: null,
+        documents: []
       };
   
-      this.mailService.create(mail).subscribe(
+      this.mailService.create(this.mail).subscribe(
         data => {
-          this.mailId = data.id;
+          this.mail.id = data.id;
           data.issuerType = null;
           data.issuerReference = null;
           data.type = data.type.toLocaleLowerCase();
@@ -120,25 +110,29 @@ export class MailformComponent implements OnInit {
         }
       );
     } else {
+      console.log('get mail metadata...');
+      this.mailService.get(mailId).subscribe(
+        data => {
+          this.mail = data;
+          console.log('get mail metadata', data);
+          data.issuerType = null;
+          data.issuerReference = null;
+          data.type = data.type.toLocaleLowerCase();
+          this.editMailForm.setValue(data);
 
-      const data = {
-        id : mailId,
-        subject: 'TODO',
-        creator: null,
-        creationDate: null,
-        lastModificationDate: null,
-        type: 'EMAIL',
-        state: 'DRAFT',
-        issuer: null,
-        issuerType: null,
-        issuerReference: null
-      };
-
-      this.mailId = data.id;
-      data.issuerType = null;
-      data.issuerReference = null;
-      data.type = data.type.toLocaleLowerCase();
-      this.editMailForm.setValue(data);
+          // this.mail.documents.push({
+          //   name: data.documents[0].name,
+          //   filename: data.documents[0].name,
+          //   type : 'type',
+          //   filetype: 'type',
+          //   size: 1
+          // });
+        },
+    // {name: 'order.pdf', type: 'attachment', filename: 'order.pdf', filetype: 'application/pdf', size: 207067},
+    err => {
+          console.log('err', err);
+        }
+      );
     }
 
     this.filteredRecipients = this.recipientCtrl.valueChanges.pipe(
@@ -179,7 +173,7 @@ export class MailformComponent implements OnInit {
           if (this.files[index].progress === 100) {
             clearInterval(progressInterval);
             const file = this.files[index];
-            this.attachments.push({
+            this.mail.documents.push({
               name: file.name.trim(),
               type: 'attachment',
               filename: file.name.trim(),
@@ -211,6 +205,16 @@ export class MailformComponent implements OnInit {
     // });
   }
 
+  public removeMail() {
+    this.mailService.removeById(this.mail.id).subscribe(
+      data => {
+        this.router.navigateByUrl('/mail/(side:list)');
+      },
+      err => {
+        console.log('err', err);
+    });
+  }
+
   prepareFilesList(files: Array<any>) {
     for (const item of files) {
       item.progress = 0;
@@ -221,7 +225,7 @@ export class MailformComponent implements OnInit {
       this.uploadFilesSimulator(0);
     }
     else {
-      if(files.length > 0) {
+      if (files.length > 0) {
 
         let headers = new HttpHeaders();
         headers = headers.append('Accept', 'application/json');
@@ -235,7 +239,7 @@ export class MailformComponent implements OnInit {
         // formData.append('state', 'active');
         // formData.append('isLastRevision', 'true');
 
-        this.http.post<any>(this.apiEndPoint + this.mailId, formData, {headers}).subscribe(res => {
+        this.http.post<any>(this.apiEndPoint + this.mail.id, formData, {headers}).subscribe(res => {
           console.log(res);
         }, err => {
           console.log(err);
@@ -345,10 +349,10 @@ export class MailformComponent implements OnInit {
   // }
 
   removeAttachment(attachment: MailDocument): void {
-    const index = this.attachments.indexOf(attachment);
+    const index = this.mail.documents.indexOf(attachment);
 
     if (index >= 0) {
-      this.attachments.splice(index, 1);
+      this.mail.documents.splice(index, 1);
     }
   }
 
@@ -366,12 +370,13 @@ export class MailformComponent implements OnInit {
       type: value.type.toUpperCase(),
       issuer: null,
       issuerType: null,
-      issuerReference: null
+      issuerReference: null,
+      documents: []
     };
 
     this.mailService.patch(mail).subscribe(
       data => {
-        this.router.navigate(['/mail']);
+        this.router.navigateByUrl('/mail/(side:list)');
       },
       err => {
         console.log('err', err);

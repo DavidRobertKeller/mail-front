@@ -1,4 +1,11 @@
-// TODO: Replace this with your own data model type
+export interface MailDocument {
+  name: string;
+  type: string;
+  filename: string;
+  filetype: string;
+  size: number;
+}
+
 export interface Mail {
   id: string;
   subject: string;
@@ -9,4 +16,5 @@ export interface Mail {
   issuer: string;
   issuerType: string;
   issuerReference: string;
+  documents: MailDocument[];
 }
