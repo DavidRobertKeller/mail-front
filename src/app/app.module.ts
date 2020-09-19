@@ -14,7 +14,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { DndDirective } from './dnd.directive';
 import { ProgressComponent } from './progress/progress.component';
-
+import { PdfViewerModule } from 'ng2-pdf-viewer';
+ 
 const appRoutes: Routes = [
   {
     path: 'mail',
@@ -58,7 +59,8 @@ const appRoutes: Routes = [
     BrowserAnimationsModule,
     LayoutModule,
     MaterialModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    PdfViewerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -19,10 +19,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class MailformComponent implements OnInit {
   public mail: Mail;
   files: any[] = [];
+  pdfSrc = null;
 
   mockFileUpload = false;
   attachmentAddOnBlur = true;
-  apiEndPoint = 'http://localhost:8080/api/mail/document/';
+  maildDocumentEndPoint = 'http://localhost:8080/api/mail/document/';
 
   mailStates = ['DRAFT', 'WORKING', 'CLOSED', 'ARCHIVED'];
 
@@ -110,26 +111,19 @@ export class MailformComponent implements OnInit {
         }
       );
     } else {
-      console.log('get mail metadata...');
       this.mailService.get(mailId).subscribe(
         data => {
           this.mail = data;
-          console.log('get mail metadata', data);
           data.issuerType = null;
           data.issuerReference = null;
           data.type = data.type.toLocaleLowerCase();
-          this.editMailForm.setValue(data);
 
-          // this.mail.documents.push({
-          //   name: data.documents[0].name,
-          //   filename: data.documents[0].name,
-          //   type : 'type',
-          //   filetype: 'type',
-          //   size: 1
-          // });
+          if (this.mail.documents.length > 0) {
+            this.pdfSrc = this.maildDocumentEndPoint + this.mail.id + '/' + this.mail.documents[0].id + '/raw';
+          }
+          this.editMailForm.setValue(data);
         },
-    // {name: 'order.pdf', type: 'attachment', filename: 'order.pdf', filetype: 'application/pdf', size: 207067},
-    err => {
+        err => {
           console.log('err', err);
         }
       );
@@ -174,6 +168,7 @@ export class MailformComponent implements OnInit {
             clearInterval(progressInterval);
             const file = this.files[index];
             this.mail.documents.push({
+              id: '' + index,
               name: file.name.trim(),
               type: 'attachment',
               filename: file.name.trim(),
@@ -195,7 +190,7 @@ export class MailformComponent implements OnInit {
 
     let link = document.createElement("a");
     link.download = "filename";
-    link.href = this.apiEndPoint + id;
+    link.href = this.maildDocumentEndPoint + id;
     link.click();
 
     // this.http.get<any>(this.apiEndPoint + id).subscribe(res => {
@@ -239,7 +234,7 @@ export class MailformComponent implements OnInit {
         // formData.append('state', 'active');
         // formData.append('isLastRevision', 'true');
 
-        this.http.post<any>(this.apiEndPoint + this.mail.id, formData, {headers}).subscribe(res => {
+        this.http.post<any>(this.maildDocumentEndPoint + this.mail.id, formData, {headers}).subscribe(res => {
           console.log(res);
         }, err => {
           console.log(err);

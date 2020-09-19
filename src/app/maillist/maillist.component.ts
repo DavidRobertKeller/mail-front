@@ -18,7 +18,6 @@ export class MaillistComponent implements AfterViewInit, OnInit {
   @ViewChild(MatTable) table: MatTable<Mail>;
   dataSource: MaillistDataSource;
 
-  /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['type', 'state', 'subject', 'creator', 'creationDate', 'lastModificationDate'];
 
   constructor(private mailService: MailService, private router: Router) { }
@@ -28,10 +27,6 @@ export class MaillistComponent implements AfterViewInit, OnInit {
     this.dataSource.loadData();
   }
 
-  // ngOnInit() {
-  //   this.dataSource = new MaillistDataSource();
-  // }
-
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
@@ -39,12 +34,6 @@ export class MaillistComponent implements AfterViewInit, OnInit {
   }
 
   public getRecord(row: any) {
-    console.log('row', row);
-
-    // this.router.navigate(['/mail/(side:edit)/' + row.id]);
-    // this.router.navigate([{  outlets: { side: ['/mail'] } }], { skipLocationChange: true });
-//    this.router.navigate([{ outlets: { primary: 'mail', side: ['add'] } }], { skipLocationChange: true });
     this.router.navigateByUrl('/mail/(side:edit/' + row.id + ')');
-
   }
 }

@@ -1,4 +1,5 @@
 export interface MailDocument {
+  id: string,
   name: string;
   type: string;
   filename: string;
