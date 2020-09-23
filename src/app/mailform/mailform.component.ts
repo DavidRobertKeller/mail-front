@@ -19,7 +19,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class MailformComponent implements OnInit {
   public mail: Mail;
   files: any[] = [];
-  pdfSrc = null;
+  currentDocumentIndex = 0;
+  currentDocumentUrl = null;
+  currentDocumentName = null;
 
   mockFileUpload = false;
   attachmentAddOnBlur = true;
@@ -119,7 +121,8 @@ export class MailformComponent implements OnInit {
           data.type = data.type.toLocaleLowerCase();
 
           if (this.mail.documents.length > 0) {
-            this.pdfSrc = this.maildDocumentEndPoint + this.mail.id + '/' + this.mail.documents[0].id + '/raw';
+            this.currentDocumentUrl = this.maildDocumentEndPoint + this.mail.id + '/' + this.mail.documents[0].id + '/raw';
+            this.currentDocumentName = this.mail.documents[0].name;
           }
           this.editMailForm.setValue(data);
         },
@@ -186,11 +189,11 @@ export class MailformComponent implements OnInit {
   }
 
   public downloadFile() {
-    let id = '5f50ff011a9e9052c554808a';
+    let id = this.mail.documents[this.currentDocumentIndex].id;
 
     let link = document.createElement("a");
     link.download = "filename";
-    link.href = this.maildDocumentEndPoint + id;
+    link.href = this.maildDocumentEndPoint + this.mail.id + '/'+ id + '/raw';
     link.click();
 
     // this.http.get<any>(this.apiEndPoint + id).subscribe(res => {

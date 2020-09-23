@@ -190,12 +190,25 @@
         </div>
         <div class="col">
           <div class="row" *ngIf="editMailForm.value.type == 'bmail'" >
-            <div class="col" *ngIf="pdfSrc" >
-              <mat-label>PDF</mat-label>
-              <pdf-viewer [src]="pdfSrc" 
-                  [render-text]="false"
-                  style="display: block;height: 600px;"
-              ></pdf-viewer>
+            <div class="col" *ngIf="currentDocumentUrl" >
+              <div>
+                <mat-label>{{ currentDocumentName }}</mat-label>
+              </div>
+              <div>
+                <mat-card-actions>
+                  <button mat-raised-button color="primary" type="button" (click)="downloadFile()">Download</button>
+                  <button mat-raised-button color="primary" type="button" (click)="downloadFile()">Add revision</button>
+                  <button mat-raised-button color="primary" type="button" (click)="downloadFile()">Set signature position</button>
+                  <button mat-raised-button color="primary" type="button" (click)="downloadFile()">Sign</button>
+                  <button mat-raised-button color="primary" type="button" (click)="downloadFile()">Remove</button>
+                </mat-card-actions>
+              </div>
+              <div>
+                <pdf-viewer [src]="currentDocumentUrl" 
+                    [render-text]="false"
+                    style="display: block;height: 600px;"
+                ></pdf-viewer>
+              </div>
             </div>
           </div>
         </div>
@@ -205,7 +218,6 @@
     </mat-card-content>
     <mat-card-actions>
       <button mat-raised-button color="primary" type="submit">Submit</button>
-      <button mat-raised-button color="primary" type="button" (click)="downloadFile()">Load Document</button>
       <button mat-raised-button color="primary" type="button" (click)="removeMail()">Remove</button>
     </mat-card-actions>
   </mat-card>
